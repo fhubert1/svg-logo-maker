@@ -32,7 +32,7 @@ const validateLogoName = (input) => {
     if (input.length <= 3) {
         return true;
     }
-    return "Logo name invalid - max 3 characters long."
+    return false;
 };
 
 // validate color hex or basic color
@@ -141,3 +141,10 @@ inquirer.prompt([
         })        
     }
 })
+
+module.exports = {
+    generateSVG,
+    validateLogoName,
+    validateColor
+
+}
