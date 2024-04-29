@@ -1,11 +1,31 @@
-const Shapes = require('./lib/shapes.js');
+const {Circle, Square, Triangle, Shapes} = require('./lib/shapes.js');
+// const Circle = require('./lib/shapes.js');
+// const Square = require('./lib/shapes.js');
+// const Triange = require('./lib/shapes.js');
+
 const fs = require('fs');
+const path = require('path');
 const inquirer = require('inquirer');
+
 const svgfile = 'logo.svg';
+const distDir = './dist/';
+const filePath = path.join(distDir, svgfile);
+const defaultTextColor = 'white';
+const defaultLogoColor = 'purple';
 
 // generate svg logo files
 //const renderCircleSVG = (radius, textColor)
+const generateSVG = (data) => {
 
+    fs.writeFile(filePath, data, (err) => {
+        if (err) {
+          console.error('Error writing to file:', err);
+          return;
+        }
+        console.log('Data has been written to the file successfully.');
+    });  
+
+}
 
 // validate logo name
 const validateLogoName = (input) => {
@@ -15,12 +35,25 @@ const validateLogoName = (input) => {
     return "Logo name invalid - max 3 characters long."
 };
 
+// validate color hex or basic color
+const validateColor = (input) => {
+
+    regEx = /^#([0-9a-fA-F]{3}){1,2}$/;
+
+    if (input.charAt() === '#' && !regEx.test(input)) {
+        return false;
+    }
+    return true;
+}
+
 // logo questions
 inquirer.prompt([
     {
         type: 'input',
         message: 'Enter the text logo color',
         name: 'textColor',
+        default: 'white',
+        validate: validateColor
     },
     {
         type: 'input',
@@ -32,6 +65,8 @@ inquirer.prompt([
         type: 'input',
         message: 'What color would you like the shape of the logo?',
         name: 'shapeColor',
+        default: 'purple',
+        validate: validateColor,
     },
     {
         type: 'list',
@@ -40,6 +75,10 @@ inquirer.prompt([
         choices: ['Circle', 'Square', 'Triangle'],
     },
 ]).then((answers) => {
+    const shapeColor = answers.shapeColor;
+    const textColor = answers.textColor;
+    const logoName = answers.logoName;
+
     if(answers.shape === 'Circle') {
         inquirer.prompt([
             {    
@@ -50,6 +89,10 @@ inquirer.prompt([
         ]).then((answers) => {
             const radius = answers.radius;
             console.log(`radius is ${radius}`);
+            
+            const myCircle = new Circle(shapeColor, logoName, textColor, radius);
+            console.log(myCircle.render());
+            generateSVG(myCircle.render());            
         })
     } else if (answers.shape === 'Square') {
         inquirer.prompt([
@@ -61,8 +104,12 @@ inquirer.prompt([
         ]).then((answers) => {
             const side = answers.side;
             console.log(`side is ${side}`);
+
+            const mySquare = new Square(shapeColor, logoName, textColor, side);
+            console.log(mySquare.render());
+            generateSVG(mySquare.render());             
         })        
-    } else if (answers.shape === 'Triange') {
+    } else if (answers.shape === 'Triangle') {
         inquirer.prompt([
             {    
                 type: 'input',
@@ -86,6 +133,11 @@ inquirer.prompt([
             console.log(`Point A coordinates ${pointA}`);
             console.log(`Point B coordinates ${pointB}`);
             console.log(`Point C coordinates ${pointC}`);
+            const myTriangle = new Triangle(shapeColor, logoName, textColor, pointA, pointB, pointC);
+
+            console.log(myTriangle.render());
+            generateSVG(myTriangle.render());   
+
         })        
     }
 })
